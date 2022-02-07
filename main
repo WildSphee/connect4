@@ -1,0 +1,66 @@
+turn = 0
+board = {}
+size = 6, 7
+columns = [0] * size[1]
+direction = [1, -10, -11, -9]
+
+def updateBoard(message = None):
+    print(f"Turn {turn}")
+    for r in range(size[0]):
+        for c in range(size[1]):
+            id = board.get(r*10 + c)
+            if id == None:
+                print("  .", end='')
+            elif id == 1:
+                print("  O", end='')
+            elif id == 0:
+                print("  X", end='')
+        print()
+    for i in range(size[1]):
+        print(f"  {i}", end='')
+    print()
+    print(message if message is not None else '')
+    checkwinner()
+
+def playchess():
+    player = turn % 2
+    try:
+        candidate = int(input("Play a column: "))
+        if not 0 <= candidate < size[1]:
+            updateBoard(f"Please place chess within range of 0 to {size[1]-1}")
+            playchess()
+            return
+        elif columns[candidate] == size[0]:
+            updateBoard("Column is full, try again~")
+            playchess()
+            return
+        else:
+            placeChess(player, candidate)
+    except Exception:
+        updateBoard("Please type in a single column number~")
+        playchess()
+        return
+
+def placeChess(player, loc):
+    global turn
+    columns[loc] += 1
+    turn += 1
+    board[loc + (size[0] - columns[loc])*10] = player
+
+    updateBoard(f"Player {turn%2 + 1}, place your chess~")
+    playchess()
+
+def checkwinner():
+    for i, (k, v) in enumerate(board.items()):
+        for d in direction:
+            for c in range(1, 4):
+                # print(f"{k=} {v=} {c=} {k+(d*c)=} {board.get(k+(d*c))=}")
+                if board.get(k+(d*c)) == None:
+                    break
+                if v != board[k+(d*c)]:
+                    break
+                if c == 3:
+                    exit(print(f"GAME ENDED! THE WINNER IS PLAYER {(turn+1)%2+1}!!!"))
+
+updateBoard(f"Player {turn%2 + 1}, place your chess~")
+playchess()
